@@ -59,7 +59,7 @@ public  class MusicPlayer {
         try {
             // 1. create a list of songs in the folder
             List<Path> files = Files.list(curGenrePath).toList();
-            int index = 0;
+            int index = 1;
             Clip clip = null;
 
 
