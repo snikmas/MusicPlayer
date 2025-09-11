@@ -62,11 +62,13 @@ public  class MusicPlayer {
             int index = 0;
             Clip clip = null;
 
+
             char userRes = 'p';
             while (userRes != '0') {
                 //2. play the song
                 if (clip == null || !clip.isOpen()) {
                     clip = Utilities.openClip(files.get(index));
+                    clip.start();
                     System.out.println("Playing " + files.get(index) + ". . .");
                 }
 
