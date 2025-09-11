@@ -3,11 +3,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 import javazoom.jl.converter.Converter;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+import jdk.jshell.execution.Util;
+
 
 import javax.sound.sampled.*;
 
@@ -25,7 +28,6 @@ public  class MusicPlayer {
             "Pop",
             "R&B",
             "Soundtrack"};
-
 
     static void start(){
         System.out.println("Genres:");
@@ -47,64 +49,63 @@ public  class MusicPlayer {
     static void favorites(){};
     static void history(){};
 
-    static String getFileExtension(String fileName){
-        int pointer = fileName.lastIndexOf('.');
-        return fileName.substring(pointer + 1);
-    }
 
-    static String convertFile(String file){
-        Converter converter = new Converter();
-        String wavFile = file.replaceAll("\\.mp3$", ".wav");
-        try {
-            converter.convert(file, wavFile);
-            return wavFile;
-        } catch (JavaLayerException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
+
     static void play(String genre){
         Path curGenrePath = currentFilePath.resolve("src").resolve("music").resolve(genre.toLowerCase());
         System.out.println(curGenrePath);
 
-        try{
-            Files.list(curGenrePath).forEach(file -> {
-                String curFileString = file.toString();
-                if(!getFileExtension(file.toString()).equals("wav")){
-                    curFileString = convertFile(file.toString());
+        try {
+            // 1. create a list of songs in the folder
+            List<Path> files = Files.list(curGenrePath).toList();
+            int index = 0;
+            Clip clip = null;
+
+            char userRes = 'p';
+            while (userRes != '0') {
+                //2. play the song
+                if (clip == null || !clip.isOpen()) {
+                    clip = Utilities.openClip(files.get(index));
+                    System.out.println("Playing " + files.get(index) + ". . .");
                 }
 
-                try {
-                    File curFile = new File(curFileString);
-                    AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(curFile);
-                    Clip clip = AudioSystem.getClip();
-                    clip.open(audioInputStream);
-                    clip.start();
+                //3. menu
+                Utilities.playerMenu();
+                userRes = scanner.next().toUpperCase().charAt(0);
 
-
-                    System.out.println("NO ptoblemd");
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                switch (userRes) {
+                    case '>' -> { // next
+                        clip.close();
+                        index = (index + 1) % files.size();
+                        clip = Utilities.openClip(files.get(index));
+                        clip.start();
+                    }
+                    case '<' -> {
+                        clip.close();
+                        index = (index - 1 + files.size()) % files.size();
+                        clip = Utilities.openClip(files.get(index));
+                        clip.start();
+                    }
+                    case 'P' -> clip.start();
+                    case 'S' -> clip.stop();
+                    case 'R' -> clip.setMicrosecondPosition(0);
+                    case '0' -> {
+                        clip.close();
+                        System.out.println("Exiting...");
+                    }
+                    default -> System.out.println("Invalid input");
                 }
-
-
-
-
-
-
-            });
-        } catch (IOException er){
-            return;
-        }
-        String curGenrePathS = genresPath.resolve(genre).toString();
-        System.out.println(curGenrePathS);
-    };
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+            };
+        };
 
 
 
     public static void main(String[] args) {
         // here we go again
-
 
         MusicPlayer Enten = new MusicPlayer();
 
