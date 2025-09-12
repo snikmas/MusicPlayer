@@ -38,11 +38,10 @@ public  class MusicPlayer {
         int promptGenre;
         promptGenre = scanner.nextInt();
 
-        switch (promptGenre){
-            case 1 -> play(genres[promptGenre]);
-            case 2 -> play(genres[promptGenre]);
-            case 3 -> play(genres[promptGenre]);
-            case 4 -> play(genres[promptGenre]);
+        if(promptGenre >= 0 && promptGenre < genres.length){
+            play(genres[promptGenre - 1]);
+        } else {
+            System.out.println("Invalid Genre!");
         }
     };
 
@@ -54,12 +53,14 @@ public  class MusicPlayer {
 
     static void play(String genre){
         Path curGenrePath = currentFilePath.resolve("src").resolve("music").resolve(genre.toLowerCase());
-        System.out.println(curGenrePath);
 
         try {
             // 1. create a list of songs in the folder
-            List<Path> files = Files.list(curGenrePath).toList();
-            int index = 1;
+            List<Path> files = Files.list(curGenrePath)
+                    .filter(p -> p.toString().endsWith(".mp3") || p.toString()
+                    .endsWith(".wav"))
+                    .toList();
+            int index = 0;
             Clip clip = null;
 
 
@@ -79,15 +80,19 @@ public  class MusicPlayer {
                 switch (userRes) {
                     case '>' -> { // next
                         clip.close();
+                        Utilities.deleteTrash(files.get(index));
                         index = (index + 1) % files.size();
                         clip = Utilities.openClip(files.get(index));
                         clip.start();
+                        System.out.println("Playing " + files.get(index).getFileName() + ". . .");
                     }
                     case '<' -> {
                         clip.close();
+                        Utilities.deleteTrash(files.get(index));
                         index = (index - 1 + files.size()) % files.size();
                         clip = Utilities.openClip(files.get(index));
                         clip.start();
+                        System.out.println("Playing " + files.get(index).getFileName() + ". . .");
                     }
                     case 'P' -> clip.start();
                     case 'S' -> clip.stop();

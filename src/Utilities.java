@@ -5,7 +5,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Utilities {
 
@@ -34,11 +38,23 @@ public class Utilities {
         System.out.println("[0] Exit");
     }
 
+    static void deleteTrash(Path path){
+
+        try {
+            if(path.toString().endsWith(".mp3")){
+                Files.deleteIfExists(path);
+            }
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
     static Clip openClip(Path filePath) {
         try {
             String curFileString = filePath.toString();
             if (!Utilities.getFileExtension(curFileString).equals("wav")) {
                 curFileString = Utilities.convertFile(curFileString);
+
             }
             File curFile = new File(curFileString);
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(curFile);
