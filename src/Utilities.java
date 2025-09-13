@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Utilities {
 
@@ -31,10 +29,11 @@ public class Utilities {
 
     static void playerMenu(){
         System.out.println("[<] Prev");
-        System.out.println("[P] Play");
-        System.out.println("[S] Stop");
-        System.out.println("[R] Restart");
         System.out.println("[>] Next");
+        System.out.println("[P] Play"); // later can do toggle: play/stop
+        System.out.println("[S] Stop");
+        System.out.println("[A] Save the track");
+        System.out.println("[R] Restart");
         System.out.println("[0] Exit");
     }
 

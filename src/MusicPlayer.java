@@ -1,15 +1,9 @@
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.IntStream;
-import javazoom.jl.converter.Converter;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
-import jdk.jshell.execution.Util;
 
 
 import javax.sound.sampled.*;
@@ -28,6 +22,7 @@ public  class MusicPlayer {
             "Pop",
             "R&B",
             "Soundtrack"};
+
 
     static void start(){
         System.out.println("Genres:");
@@ -70,7 +65,8 @@ public  class MusicPlayer {
                 if (clip == null || !clip.isOpen()) {
                     clip = Utilities.openClip(files.get(index));
                     clip.start();
-                    System.out.println("Playing " + files.get(index) + ". . .");
+                    System.out.println("Playing " + files.get(index).getFileName() + ". . .");
+                    History.historyAdd(files.get(index).getFileName().toString());
                 }
 
                 //3. menu
@@ -85,6 +81,7 @@ public  class MusicPlayer {
                         clip = Utilities.openClip(files.get(index));
                         clip.start();
                         System.out.println("Playing " + files.get(index).getFileName() + ". . .");
+                        History.historyAdd(files.get(index).getFileName().toString());
                     }
                     case '<' -> {
                         clip.close();
@@ -92,11 +89,13 @@ public  class MusicPlayer {
                         index = (index - 1 + files.size()) % files.size();
                         clip = Utilities.openClip(files.get(index));
                         clip.start();
+                        History.historyAdd(files.get(index).getFileName().toString());
                         System.out.println("Playing " + files.get(index).getFileName() + ". . .");
                     }
                     case 'P' -> clip.start();
                     case 'S' -> clip.stop();
                     case 'R' -> clip.setMicrosecondPosition(0);
+                    case 'A' -> Saved.addSave(files.get(index).getFileName().toString());
                     case '0' -> {
                         clip.close();
                         System.out.println("Exiting...");
@@ -126,7 +125,7 @@ public  class MusicPlayer {
         while(choice != 0){
             System.out.println("Menu");
             System.out.println("[1] Start");
-            System.out.println("[2] Favorites");
+            System.out.println("[2] Saved");
             System.out.println("[3] History");
             System.out.println("[0] Exit");
 
@@ -134,8 +133,8 @@ public  class MusicPlayer {
 
             switch (choice){
                 case 1 -> Enten.start();
-                case 2 -> Enten.favorites();
-                case 3 -> Enten.history();
+                case 2 -> Saved.viewSave();
+                case 3 -> History.viewHistory();
             }
         }
         // menu..
